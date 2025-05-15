@@ -14,6 +14,7 @@ import { autoUpdater } from 'electron-updater';
 import log from 'electron-log';
 import MenuBuilder from './menu';
 import { resolveHtmlPath } from './util';
+import { ProductService, Product } from './database/database';
 
 class AppUpdater {
   constructor() {
@@ -29,6 +30,61 @@ ipcMain.on('ipc-example', async (event, arg) => {
   const msgTemplate = (pingPong: string) => `IPC test: ${pingPong}`;
   console.log(msgTemplate(arg));
   event.reply('ipc-example', msgTemplate('pong'));
+});
+
+// Handler para obtener todos los productos
+ipcMain.handle('get-all-products', async () => {
+  try {
+    const products = await ProductService.getAllProducts();
+    return products;
+  } catch (error) {
+    console.error('Error al obtener productos:', error);
+    throw error;
+  }
+});
+
+// Handler para obtener un producto por ID
+ipcMain.handle('get-product-by-id', async (_, id: string) => {
+  try {
+    const product = await ProductService.getProductById(id);
+    return product;
+  } catch (error) {
+    console.error('Error al obtener producto por ID:', error);
+    throw error;
+  }
+});
+
+// Handler para añadir un nuevo producto
+ipcMain.handle('add-product', async (_, product: Product) => {
+  try {
+    const newProduct = await ProductService.addProduct(product);
+    return newProduct;
+  } catch (error) {
+    console.error('Error al añadir producto:', error);
+    throw error;
+  }
+});
+
+// Handler para actualizar un producto
+ipcMain.handle('update-product', async (_, id: string, product: Partial<Product>) => {
+  try {
+    const updated = await ProductService.updateProduct(id, product);
+    return updated;
+  } catch (error) {
+    console.error('Error al actualizar producto:', error);
+    throw error;
+  }
+});
+
+// Handler para eliminar un producto
+ipcMain.handle('delete-product', async (_, id: string) => {
+  try {
+    const deleted = await ProductService.deleteProduct(id);
+    return deleted;
+  } catch (error) {
+    console.error('Error al eliminar producto:', error);
+    throw error;
+  }
 });
 
 if (process.env.NODE_ENV === 'production') {
