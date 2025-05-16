@@ -14,7 +14,11 @@ import { autoUpdater } from 'electron-updater';
 import log from 'electron-log';
 import MenuBuilder from './menu';
 import { resolveHtmlPath } from './util';
-import { ProductService, Product } from './database/database';
+import {
+  ProductService, Product,
+  CategoryService, Category,
+  SubcategoryService, Subcategory
+} from './database/database';
 
 class AppUpdater {
   constructor() {
@@ -83,6 +87,118 @@ ipcMain.handle('delete-product', async (_, id: string) => {
     return deleted;
   } catch (error) {
     console.error('Error al eliminar producto:', error);
+    throw error;
+  }
+});
+
+// Handlers para Categorías
+ipcMain.handle('get-all-categories', async () => {
+  try {
+    const categories = await CategoryService.getAllCategories();
+    return categories;
+  } catch (error) {
+    console.error('Error al obtener categorías:', error);
+    throw error;
+  }
+});
+
+ipcMain.handle('get-category-by-id', async (_, id: string) => {
+  try {
+    const category = await CategoryService.getCategoryById(id);
+    return category;
+  } catch (error) {
+    console.error('Error al obtener categoría por ID:', error);
+    throw error;
+  }
+});
+
+ipcMain.handle('add-category', async (_, category: Category) => {
+  try {
+    const newCategory = await CategoryService.addCategory(category);
+    return newCategory;
+  } catch (error) {
+    console.error('Error al añadir categoría:', error);
+    throw error;
+  }
+});
+
+ipcMain.handle('update-category', async (_, id: string, category: Partial<Category>) => {
+  try {
+    const updated = await CategoryService.updateCategory(id, category);
+    return updated;
+  } catch (error) {
+    console.error('Error al actualizar categoría:', error);
+    throw error;
+  }
+});
+
+ipcMain.handle('delete-category', async (_, id: string) => {
+  try {
+    const deleted = await CategoryService.deleteCategory(id);
+    return deleted;
+  } catch (error) {
+    console.error('Error al eliminar categoría:', error);
+    throw error;
+  }
+});
+
+// Handlers para Subcategorías
+ipcMain.handle('get-all-subcategories', async () => {
+  try {
+    const subcategories = await SubcategoryService.getAllSubcategories();
+    return subcategories;
+  } catch (error) {
+    console.error('Error al obtener subcategorías:', error);
+    throw error;
+  }
+});
+
+ipcMain.handle('get-subcategories-by-category', async (_, categoryId: string) => {
+  try {
+    const subcategories = await SubcategoryService.getSubcategoriesByCategory(categoryId);
+    return subcategories;
+  } catch (error) {
+    console.error('Error al obtener subcategorías por categoría:', error);
+    throw error;
+  }
+});
+
+ipcMain.handle('get-subcategory-by-id', async (_, id: string) => {
+  try {
+    const subcategory = await SubcategoryService.getSubcategoryById(id);
+    return subcategory;
+  } catch (error) {
+    console.error('Error al obtener subcategoría por ID:', error);
+    throw error;
+  }
+});
+
+ipcMain.handle('add-subcategory', async (_, subcategory: Subcategory) => {
+  try {
+    const newSubcategory = await SubcategoryService.addSubcategory(subcategory);
+    return newSubcategory;
+  } catch (error) {
+    console.error('Error al añadir subcategoría:', error);
+    throw error;
+  }
+});
+
+ipcMain.handle('update-subcategory', async (_, id: string, subcategory: Partial<Subcategory>) => {
+  try {
+    const updated = await SubcategoryService.updateSubcategory(id, subcategory);
+    return updated;
+  } catch (error) {
+    console.error('Error al actualizar subcategoría:', error);
+    throw error;
+  }
+});
+
+ipcMain.handle('delete-subcategory', async (_, id: string) => {
+  try {
+    const deleted = await SubcategoryService.deleteSubcategory(id);
+    return deleted;
+  } catch (error) {
+    console.error('Error al eliminar subcategoría:', error);
     throw error;
   }
 });

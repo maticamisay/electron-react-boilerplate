@@ -1,7 +1,7 @@
 // Disable no-unused-vars, broken for spread args
 /* eslint no-unused-vars: off */
 import { contextBridge, ipcRenderer, IpcRendererEvent } from 'electron';
-import type { Product } from './database/database';
+import type { Product, Category, Subcategory } from './database/database';
 
 export type Channels = 'ipc-example';
 
@@ -11,6 +11,23 @@ interface ProductAPI {
   addProduct: (product: Product) => Promise<Product>;
   updateProduct: (id: string, product: Partial<Product>) => Promise<number>;
   deleteProduct: (id: string) => Promise<number>;
+}
+
+interface CategoryAPI {
+  getAllCategories: () => Promise<Category[]>;
+  getCategoryById: (id: string) => Promise<Category | null>;
+  addCategory: (category: Category) => Promise<Category>;
+  updateCategory: (id: string, category: Partial<Category>) => Promise<number>;
+  deleteCategory: (id: string) => Promise<number>;
+}
+
+interface SubcategoryAPI {
+  getAllSubcategories: () => Promise<Subcategory[]>;
+  getSubcategoriesByCategory: (categoryId: string) => Promise<Subcategory[]>;
+  getSubcategoryById: (id: string) => Promise<Subcategory | null>;
+  addSubcategory: (subcategory: Subcategory) => Promise<Subcategory>;
+  updateSubcategory: (id: string, subcategory: Partial<Subcategory>) => Promise<number>;
+  deleteSubcategory: (id: string) => Promise<number>;
 }
 
 const electronHandler = {
@@ -47,6 +64,45 @@ const electronHandler = {
     },
     deleteProduct(id: string): Promise<number> {
       return ipcRenderer.invoke('delete-product', id);
+    },
+  },
+  // API para categorías
+  categoryAPI: {
+    getAllCategories(): Promise<Category[]> {
+      return ipcRenderer.invoke('get-all-categories');
+    },
+    getCategoryById(id: string): Promise<Category | null> {
+      return ipcRenderer.invoke('get-category-by-id', id);
+    },
+    addCategory(category: Category): Promise<Category> {
+      return ipcRenderer.invoke('add-category', category);
+    },
+    updateCategory(id: string, category: Partial<Category>): Promise<number> {
+      return ipcRenderer.invoke('update-category', id, category);
+    },
+    deleteCategory(id: string): Promise<number> {
+      return ipcRenderer.invoke('delete-category', id);
+    },
+  },
+  // API para subcategorías
+  subcategoryAPI: {
+    getAllSubcategories(): Promise<Subcategory[]> {
+      return ipcRenderer.invoke('get-all-subcategories');
+    },
+    getSubcategoriesByCategory(categoryId: string): Promise<Subcategory[]> {
+      return ipcRenderer.invoke('get-subcategories-by-category', categoryId);
+    },
+    getSubcategoryById(id: string): Promise<Subcategory | null> {
+      return ipcRenderer.invoke('get-subcategory-by-id', id);
+    },
+    addSubcategory(subcategory: Subcategory): Promise<Subcategory> {
+      return ipcRenderer.invoke('add-subcategory', subcategory);
+    },
+    updateSubcategory(id: string, subcategory: Partial<Subcategory>): Promise<number> {
+      return ipcRenderer.invoke('update-subcategory', id, subcategory);
+    },
+    deleteSubcategory(id: string): Promise<number> {
+      return ipcRenderer.invoke('delete-subcategory', id);
     },
   },
 };
